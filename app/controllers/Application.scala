@@ -7,11 +7,8 @@ import services.{SunService, WeatherService}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 
-class Application @Inject() (components: ControllerComponents, ws: WSClient)
+class Application (components: ControllerComponents, sunService: SunService, weatherService: WeatherService)
     extends AbstractController(components) {
-
-  val sunService = new SunService(ws)
-  val weatherService = new WeatherService(ws)
 
   def index = Action.async {
     val lat = 43.31283
