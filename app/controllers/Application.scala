@@ -7,6 +7,8 @@ import play.api._
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import java.time.{ZoneId, ZonedDateTime}
+import java.time.format.DateTimeFormatter
 
 
 class Application @Inject() (components: ControllerComponents, ws: WSClient)
@@ -17,7 +19,10 @@ class Application @Inject() (components: ControllerComponents, ws: WSClient)
       val json = response.json
       val sunriseTimeStr = (json \ "results" \ "sunrise").as[String]
       val sunsetTimeStr = (json \ "results" \ "sunset").as[String]
-      val sunInfo = SunInfo(sunriseTimeStr, sunsetTimeStr)
+      val sunriseTime = ZonedDateTime.parse(sunriseTimeStr)
+      val sunsetTime = ZonedDateTime.parse(sunsetTimeStr)
+      val formatter = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.of("Europe/Warsaw"))
+      val sunInfo = SunInfo(sunriseTime.format(formatter), sunsetTime.format(formatter))
       Ok(views.html.index(sunInfo))
     }
   }
