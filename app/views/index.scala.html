@@ -1,4 +1,4 @@
-@(sunInfo: models.SunInfo)
+@(sunInfo: models.SunInfo, temperature: Double)
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -10,5 +10,6 @@
         <h1>San Sebastian, Spain</h1>
         <div>Sunrise time: @sunInfo.sunrise</div>
         <div>Sunset time: @sunInfo.sunset</div>
+        <div>Current remperature: @temperature</div>
     </body>
 </html>
