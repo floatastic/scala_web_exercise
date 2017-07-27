@@ -10,6 +10,8 @@ import _root_.controllers.AssetsComponents
 import play.filters.HttpFiltersComponents
 import services.{SunService, WeatherService}
 
+import scala.concurrent.Future
+
 class AppApplicationLoader extends ApplicationLoader {
   def load(context: Context) = {
     LoggerConfigurator(context.environment.classLoader).foreach { cfg =>
@@ -21,6 +23,15 @@ class AppApplicationLoader extends ApplicationLoader {
 
 class AppComponents(context: Context) extends BuiltInComponentsFromContext(context) with AhcWSComponents
   with AssetsComponents with HttpFiltersComponents {
+
+  val onStart = {
+    Logger.info("The app is about to start.")
+  }
+
+  applicationLifecycle.addStopHook { () =>
+    Logger.info("The app is about to stop")
+    Future.successful(Unit)
+  }
 
   override lazy val controllerComponents = wire[DefaultControllerComponents]
   lazy val prefix: String = "/"
