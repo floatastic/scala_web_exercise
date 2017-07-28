@@ -1,3 +1,4 @@
+import actors.StatsActor
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import play.Logger
@@ -8,6 +9,7 @@ import scala.concurrent.Future
 class StatsFilter(actorSystem: ActorSystem, implicit val mat: Materializer) extends Filter {
   override def apply(next: RequestHeader => Future[Result])(request: RequestHeader): Future[Result] = {
     Logger.info(s"Serving another request: ${request.path}")
+    actorSystem.actorSelection(StatsActor.path) ! StatsActor.RequestReceived
     next(request)
   }
 }

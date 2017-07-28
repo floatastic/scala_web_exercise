@@ -7,6 +7,9 @@ import router.Routes
 import play.api.routing.Router
 import com.softwaremill.macwire._
 import _root_.controllers.AssetsComponents
+import actors.StatsActor
+import actors.StatsActor.Ping
+import akka.actor.Props
 import play.filters.HttpFiltersComponents
 import services.{SunService, WeatherService}
 
@@ -26,6 +29,7 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
 
   val onStart = {
     Logger.info("The app is about to start.")
+    statsActor ! Ping
   }
 
   applicationLifecycle.addStopHook { () =>
@@ -40,6 +44,8 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
 
   lazy val statsFilter: Filter = wire[StatsFilter]
   override lazy val httpFilters = Seq(statsFilter)
+
+  lazy val statsActor = actorSystem.actorOf( Props(wire[StatsActor]), StatsActor.name)
 
   lazy val sunService = wire[SunService]
   lazy val weatherService = wire[WeatherService]

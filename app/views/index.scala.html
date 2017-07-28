@@ -1,4 +1,4 @@
-@(sunInfo: models.SunInfo, temperature: Double)
+@(sunInfo: models.SunInfo, temperature: Double, statsCount: Int)
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -11,5 +11,6 @@
         <div>Sunrise time: @sunInfo.sunrise</div>
         <div>Sunset time: @sunInfo.sunset</div>
         <div>Current remperature: @temperature</div>
+        <div>Requests: @statsCount</div>
     </body>
 </html>
