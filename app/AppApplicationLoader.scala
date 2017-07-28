@@ -38,6 +38,9 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
   lazy val router: Router = wire[Routes]
   lazy val applicationController = wire[Application]
 
+  lazy val statsFilter: Filter = wire[StatsFilter]
+  override lazy val httpFilters = Seq(statsFilter)
+
   lazy val sunService = wire[SunService]
   lazy val weatherService = wire[WeatherService]
 }
