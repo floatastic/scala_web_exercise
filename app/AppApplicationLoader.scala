@@ -12,6 +12,7 @@ import actors.StatsActor.Ping
 import akka.actor.Props
 import play.filters.HttpFiltersComponents
 import services.{SunService, WeatherService}
+import scalikejdbc.config.DBs
 
 import scala.concurrent.Future
 
@@ -29,11 +30,13 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
 
   val onStart = {
     Logger.info("The app is about to start.")
+    DBs.setupAll()
     statsActor ! Ping
   }
 
   applicationLifecycle.addStopHook { () =>
     Logger.info("The app is about to stop")
+    DBs.closeAll()
     Future.successful(Unit)
   }
 
