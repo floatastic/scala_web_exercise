@@ -20,6 +20,10 @@ class Application (components: ControllerComponents, sunService: SunService, wea
     Ok(views.html.index())
   }
 
+  def login = Action {
+    Ok(views.html.login())
+  }
+
   def data = Action.async {
     val lat = 43.31283
     val lon = -1.97499
