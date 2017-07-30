@@ -10,6 +10,8 @@ import _root_.controllers.AssetsComponents
 import actors.StatsActor
 import actors.StatsActor.Ping
 import akka.actor.Props
+import play.api.db.{DBComponents, HikariCPComponents}
+import play.api.db.evolutions.{DynamicEvolutions, EvolutionsComponents}
 import play.filters.HttpFiltersComponents
 import services.{SunService, WeatherService}
 import scalikejdbc.config.DBs
@@ -26,10 +28,12 @@ class AppApplicationLoader extends ApplicationLoader {
 }
 
 class AppComponents(context: Context) extends BuiltInComponentsFromContext(context) with AhcWSComponents
-  with AssetsComponents with HttpFiltersComponents {
+  with AssetsComponents with HttpFiltersComponents with EvolutionsComponents with DBComponents
+  with HikariCPComponents {
 
   val onStart = {
     Logger.info("The app is about to start.")
+    applicationEvolutions
     DBs.setupAll()
     statsActor ! Ping
   }
@@ -44,6 +48,8 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
   lazy val prefix: String = "/"
   lazy val router: Router = wire[Routes]
   lazy val applicationController = wire[Application]
+
+  override lazy val dynamicEvolutions = new DynamicEvolutions
 
   lazy val statsFilter: Filter = wire[StatsFilter]
   override lazy val httpFilters = Seq(statsFilter)
