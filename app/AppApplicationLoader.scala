@@ -10,6 +10,7 @@ import _root_.controllers.AssetsComponents
 import actors.StatsActor
 import actors.StatsActor.Ping
 import akka.actor.Props
+import play.api.cache.ehcache.EhCacheComponents
 import play.api.db.{DBComponents, HikariCPComponents}
 import play.api.db.evolutions.{DynamicEvolutions, EvolutionsComponents}
 import play.filters.HttpFiltersComponents
@@ -29,7 +30,7 @@ class AppApplicationLoader extends ApplicationLoader {
 
 class AppComponents(context: Context) extends BuiltInComponentsFromContext(context) with AhcWSComponents
   with AssetsComponents with HttpFiltersComponents with EvolutionsComponents with DBComponents
-  with HikariCPComponents {
+  with HikariCPComponents with EhCacheComponents {
 
   val onStart = {
     Logger.info("The app is about to start.")
@@ -55,6 +56,8 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
   override lazy val httpFilters = Seq(statsFilter)
 
   lazy val statsActor = actorSystem.actorOf( Props(wire[StatsActor]), StatsActor.name)
+
+  lazy val authService = new AuthService(defaultCacheApi.sync)
 
   lazy val sunService = wire[SunService]
   lazy val weatherService = wire[WeatherService]
