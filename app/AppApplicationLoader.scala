@@ -10,6 +10,7 @@ import _root_.controllers.AssetsComponents
 import actors.StatsActor
 import actors.StatsActor.Ping
 import akka.actor.Props
+import models.AuthService
 import play.api.cache.ehcache.EhCacheComponents
 import play.api.db.{DBComponents, HikariCPComponents}
 import play.api.db.evolutions.{DynamicEvolutions, EvolutionsComponents}
@@ -48,6 +49,7 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
   override lazy val controllerComponents = wire[DefaultControllerComponents]
   lazy val prefix: String = "/"
   lazy val router: Router = wire[Routes]
+  lazy val authService = new AuthService(defaultCacheApi.sync)
   lazy val applicationController = wire[Application]
 
   override lazy val dynamicEvolutions = new DynamicEvolutions
@@ -56,8 +58,6 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
   override lazy val httpFilters = Seq(statsFilter)
 
   lazy val statsActor = actorSystem.actorOf( Props(wire[StatsActor]), StatsActor.name)
-
-  lazy val authService = new AuthService(defaultCacheApi.sync)
 
   lazy val sunService = wire[SunService]
   lazy val weatherService = wire[WeatherService]

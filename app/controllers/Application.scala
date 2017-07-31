@@ -6,15 +6,26 @@ import actors.StatsActor
 import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.util.Timeout
-import models.CombinedData
+import models.{AuthService, CombinedData}
 import play.api.mvc._
 import services.{SunService, WeatherService}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
+import play.api.data.Form
+import play.api.data.Forms._
 
+case class UserLoginData(username: String, password: String)
 
-class Application (components: ControllerComponents, sunService: SunService, weatherService: WeatherService, actorSystem: ActorSystem)
+class Application (components: ControllerComponents, sunService: SunService, weatherService: WeatherService,
+                   actorSystem: ActorSystem, authService: AuthService)
     extends AbstractController(components) {
+
+  val userDataForm = Form {
+    mapping(
+      "username" -> nonEmptyText,
+      "password" -> nonEmptyText
+    )(UserLoginData.apply)(UserLoginData.unapply)
+  }
 
   def index = Action {
     Ok(views.html.index())
@@ -22,6 +33,21 @@ class Application (components: ControllerComponents, sunService: SunService, wea
 
   def login = Action {
     Ok(views.html.login())
+  }
+
+  def doLogin = Action { implicit request =>
+    userDataForm.bindFromRequest.fold(
+      formWithErrors => BadRequest,
+      userData => {
+        val maybeCookie = authService.login(userData.username, userData.password)
+        maybeCookie match {
+          case Some(cookie) =>
+            Redirect("/").withCookies(cookie)
+          case None =>
+            Ok(views.html.login())
+        }
+      }
+    )
   }
 
   def data = Action.async {

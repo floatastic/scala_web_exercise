@@ -1,13 +1,14 @@
+package models
+
 import java.security.MessageDigest
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import scalikejdbc._
-import models.User
 import org.apache.commons.codec.binary.Base64
 import org.mindrot.jbcrypt.BCrypt
 import play.api.cache.SyncCacheApi
 import play.api.mvc.Cookie
+import scalikejdbc._
 
 import scala.concurrent.duration.Duration
 
