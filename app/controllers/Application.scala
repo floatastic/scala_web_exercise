@@ -6,7 +6,7 @@ import actors.StatsActor
 import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.util.Timeout
-import models.{AuthService, CombinedData}
+import models.{AuthService, CombinedData, UserAuthAction}
 import play.api.mvc._
 import services.{SunService, WeatherService}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -17,7 +17,7 @@ import play.api.data.Forms._
 case class UserLoginData(username: String, password: String)
 
 class Application (components: ControllerComponents, sunService: SunService, weatherService: WeatherService,
-                   actorSystem: ActorSystem, authService: AuthService)
+                   actorSystem: ActorSystem, authService: AuthService, userAuthAction: UserAuthAction)
     extends AbstractController(components) {
 
   val userDataForm = Form {
@@ -27,24 +27,28 @@ class Application (components: ControllerComponents, sunService: SunService, wea
     )(UserLoginData.apply)(UserLoginData.unapply)
   }
 
+  def restricted = userAuthAction { userAuthRequest =>
+    Ok(views.html.restricted(userAuthRequest.user))
+  }
+
   def index = Action {
     Ok(views.html.index())
   }
 
   def login = Action {
-    Ok(views.html.login())
+    Ok(views.html.login(None))
   }
 
   def doLogin = Action { implicit request =>
     userDataForm.bindFromRequest.fold(
-      formWithErrors => BadRequest,
+      formWithErrors => Ok(views.html.login(Some("Wrong data"))),
       userData => {
         val maybeCookie = authService.login(userData.username, userData.password)
         maybeCookie match {
           case Some(cookie) =>
             Redirect("/").withCookies(cookie)
           case None =>
-            Ok(views.html.login())
+            Ok(views.html.login(Some("Login failed")))
         }
       }
     )

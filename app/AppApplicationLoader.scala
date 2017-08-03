@@ -10,7 +10,7 @@ import _root_.controllers.AssetsComponents
 import actors.StatsActor
 import actors.StatsActor.Ping
 import akka.actor.Props
-import models.AuthService
+import models.{AuthService, UserAuthAction}
 import play.api.cache.ehcache.EhCacheComponents
 import play.api.db.{DBComponents, HikariCPComponents}
 import play.api.db.evolutions.{DynamicEvolutions, EvolutionsComponents}
@@ -61,4 +61,6 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
 
   lazy val sunService = wire[SunService]
   lazy val weatherService = wire[WeatherService]
+
+  lazy val userAuthAction = wire[UserAuthAction]
 }

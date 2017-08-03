@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 import org.apache.commons.codec.binary.Base64
 import org.mindrot.jbcrypt.BCrypt
 import play.api.cache.SyncCacheApi
-import play.api.mvc.Cookie
+import play.api.mvc.{Cookie, RequestHeader}
 import scalikejdbc._
 
 import scala.concurrent.duration.Duration
@@ -22,6 +22,15 @@ class AuthService(cacheApi: SyncCacheApi) {
       cookie <- Some(createCookie(user))
     } yield {
       cookie
+    }
+  }
+
+  def checkCookie(header: RequestHeader): Option[User] = {
+    for {
+      cookie <- header.cookies.get(cookieHeader)
+      user <- cacheApi.get[User](cookie.value)
+    } yield {
+      user
     }
   }
 

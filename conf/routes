@@ -7,3 +7,5 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 GET     /login                      controllers.Application.login
 
 POST    /login                      controllers.Application.doLogin
+
+GET     /restricted                 controllers.Application.restricted
