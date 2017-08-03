@@ -8,7 +8,7 @@ import play.api.libs.ws.WSClient
 
 class SunService(wsClient: WSClient) {
   def getSunInfo(lat: Double, lon: Double) = {
-    val sunResponseF = wsClient.url("http://api.sunrise-sunset.org/json?lat=43.31283&lng=-1.97499&formatted=0").get()
+    val sunResponseF = wsClient.url(s"http://api.sunrise-sunset.org/json?lat=$lat&lng=$lon&formatted=0").get()
     sunResponseF.map { sunResponse => sunResponseF
       val json = sunResponse.json
       val sunriseTimeStr = (json \ "results" \ "sunrise").as[String]
